@@ -3,25 +3,37 @@
 # Use root user
 [ "$UID" -eq 0 ] || exec sudo bash "$0" "$@"
 
-while getopts ":k:p:r:" opt; do
+while getopts ":k:p:h:u:" opt; do
   case $opt in
     k) key="$OPTARG"
     ;;
     p) port="$OPTARG"
     ;;
-    r) remote_server="$OPTARG"
+    h) host="$OPTARG"
+    ;;
+    u) user="$OPTARG"
     ;;
   esac
 done
 
 if [ -z "$key" ]
 then
-  echo >&2 "Must provide a key path!"; exit 1;
+  echo >&2 "Must provide a key path (-k)!"; exit 1;
 fi
 
 if [ -z "$port" ]
 then
-  echo >&2 "Must provide a port!"; exit 1;
+  echo >&2 "Must provide a port (-p)!"; exit 1;
+fi
+
+if [ -z "$host" ]
+then
+  echo >&2 "Must provide a host (-h)!"; exit 1;
+fi
+
+if [ -z "$user" ]
+then
+  echo >&2 "Must provide a user (-u)!"; exit 1;
 fi
 
 # Check for internet connection
@@ -46,7 +58,17 @@ fi
 systemctl start sshd
 systemctl enable ssh.service
 
+# Add used hosts to known hosts
+ssh-keyscan localhost >> ~/.ssh/known_hosts
+ssh-keyscan $host >> ~/.ssh/known_hosts
+
+# Test ssh connections
+ssh -i $key $user@$host exit
+if [ $? -ne 0 ]; then
+  echo >&2 "SSH connection failed!"; exit 1;
+fi
+
 # Start reverse tunnel
-autossh -N -i $key -N $remote_server -R $port:localhost:22
+autossh -f -nNT -i $key -N $user@$host -R $port:localhost:22
 
 echo "Tunnel opened on remote port ${port}"
