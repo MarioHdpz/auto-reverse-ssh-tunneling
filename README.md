@@ -21,5 +21,7 @@
 1. Run the script:
 
     ```console
-    ./open-reverse-tunnel.sh --key myKey.pem --port 1234
+    ./open-reverse-tunnel.sh --k myKey.pem --p 1234
     ```
+
+    Where **p** is the path to the `.pem` file and **p** is the VPS port for the reverse tunnel.
