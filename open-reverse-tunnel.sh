@@ -3,11 +3,13 @@
 # Use root user
 [ "$UID" -eq 0 ] || exec sudo bash "$0" "$@"
 
-while getopts ":k:p:" opt; do
+while getopts ":k:p:r:" opt; do
   case $opt in
     k) key="$OPTARG"
     ;;
     p) port="$OPTARG"
+    ;;
+    r) remote_server="$OPTARG"
     ;;
   esac
 done
@@ -34,3 +36,17 @@ then
   apt-get install autossh -y;
 fi
 
+# Install autossh if not installed
+if [ $(dpkg-query -W -f='${Status}' openssh-server 2>/dev/null | grep -c "ok installed") -eq 0 ];
+then
+  apt-get install openssh-server -y;
+fi
+
+# Enable ssh from localhost
+systemctl start sshd
+systemctl enable ssh.service
+
+# Start reverse tunnel
+autossh -N -i $key -N $remote_server -R $port:localhost:22
+
+echo "Tunnel opened on remote port ${port}"
