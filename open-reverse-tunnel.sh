@@ -59,8 +59,15 @@ systemctl start sshd
 systemctl enable ssh.service
 
 # Add used hosts to known hosts
-ssh-keyscan localhost >> ~/.ssh/known_hosts
-ssh-keyscan $host >> ~/.ssh/known_hosts
+if [ ! -e ~/.ssh/known_hosts ]; then
+  touch ~/.ssh/known_hosts
+fi
+if ! cat ~/.ssh/known_hosts | grep -q localhost; then
+  ssh-keyscan localhost >> ~/.ssh/known_hosts
+fi
+if ! cat ~/.ssh/known_hosts | grep -q $host; then
+  ssh-keyscan $host >> ~/.ssh/known_hosts
+fi
 
 # Test ssh connections
 ssh -i $key $user@$host exit
@@ -71,7 +78,7 @@ fi
 conf_file="/etc/systemd/system/autotunnel.service"
 if [ -e $conf_file ]; then
   rm $conf_file
-  echo "Previous conf file removed!"
+  echo "Previous service conf file found, replacing..."
 fi
 
 echo -e "[Unit]" >> $conf_file
@@ -84,11 +91,14 @@ echo -e "\n[Install]" >> $conf_file
 echo -e "WantedBy=multi-user.target" >> $conf_file
 
 systemctl daemon-reload
+echo "Starting tunnel as a service..."
 systemctl start autotunnel
 sleep 5
 
-systemctl status autotunnel.service
-systemctl enable autotunnel.service
-
-# Start reverse tunnel
-#echo "Tunnel opened on remote port ${port}"
+tunnel_status="$(systemctl is-active autotunnel.service)"
+if [ "${tunnel_status}" = "active" ]; then
+    systemctl enable autotunnel.service
+    echo "Tunnel succesfully opened on remote port ${port}"
+else
+  systemctl status autotunnel.service
+fi
