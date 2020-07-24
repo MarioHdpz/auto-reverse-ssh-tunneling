@@ -68,7 +68,27 @@ if [ $? -ne 0 ]; then
   echo >&2 "SSH connection failed!"; exit 1;
 fi
 
-# Start reverse tunnel
-autossh -f -nNT -i $key -N $user@$host -R $port:localhost:22
+conf_file="/etc/systemd/system/autotunnel.service"
+if [ -e $conf_file ]; then
+  rm $conf_file
+  echo "Previous conf file removed!"
+fi
 
-echo "Tunnel opened on remote port ${port}"
+echo -e "[Unit]" >> $conf_file
+echo -e "Description=autossh daemon for ssh tunnel" >> $conf_file
+echo -e "Wants=network-online.target" >> $conf_file
+echo -e "After=network-online.target" >> $conf_file
+echo -e "\n[Service]" >> $conf_file
+echo -e "ExecStart=/usr/bin/autossh -f -nNT -i ${key} ${user}@${host} -R ${port}:localhost:22" >> $conf_file
+echo -e "\n[Install]" >> $conf_file
+echo -e "WantedBy=multi-user.target" >> $conf_file
+
+systemctl daemon-reload
+systemctl start autotunnel
+sleep 5
+
+systemctl status autotunnel.service
+systemctl enable autotunnel.service
+
+# Start reverse tunnel
+#echo "Tunnel opened on remote port ${port}"
