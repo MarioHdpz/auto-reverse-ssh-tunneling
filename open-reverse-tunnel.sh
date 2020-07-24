@@ -42,6 +42,8 @@ if [ $? -ne 0 ]; then
   echo >&2 "Must have internet connection!"; exit 1;
 fi
 
+apt-get update
+
 # Install autossh if not installed
 if [ $(dpkg-query -W -f='${Status}' autossh 2>/dev/null | grep -c "ok installed") -eq 0 ];
 then
