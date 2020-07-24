@@ -10,7 +10,7 @@
 
 ## How to use
 
-1. Copy the `open-reverse-tunnel.sh` to the device where you want to open a tunnel.
+1. Copy the `open-reverse-tunnel.sh` to the device where you want to open a reverse tunnel.
 
 1. Give permissions as an executable script.
 
@@ -21,7 +21,11 @@
 1. Run the script:
 
     ```console
-    ./open-reverse-tunnel.sh --k myKey.pem --p 1234
+    ./open-reverse-tunnel.sh -k myKey.pem -p 1234 -u remoteuser -h example.com
     ```
 
-    Where **p** is the path to the `.pem` file and **p** is the VPS port for the reverse tunnel.
+    Where:
+    - **k** is the path to the `.pem` file.
+    - **p** is the VPS port for the reverse tunnel.
+    - **u** is the VPS user.
+    - **h** is the VPS host.
