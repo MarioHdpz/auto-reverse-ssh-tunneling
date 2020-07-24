@@ -5,7 +5,12 @@
 1. Have a properly configured VPS to accept ssh tunnels:
     - Incoming ports opened
     - Connection via a `.pem` key
-
+    - Add this options to your `/etc/ssh/sshd_config`
+        ```console
+        ClientAliveInterval 15
+        ClientAliveCountMax 3
+        ```
+    
 1. Have a sudo user.
 
 ## How to use
