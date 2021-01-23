@@ -87,8 +87,12 @@ echo -e "[Unit]" >> $conf_file
 echo -e "Description=autossh daemon for ssh tunnel" >> $conf_file
 echo -e "Wants=network-online.target" >> $conf_file
 echo -e "After=network-online.target" >> $conf_file
+echo -e "StartLimitIntervalSec=200" >> $conf_file
+echo -e "StartLimitBurst=5" >> $conf_file
 echo -e "\n[Service]" >> $conf_file
 echo -e "ExecStart=/usr/bin/autossh -nNT -i ${key} ${user}@${host} -R ${port}:localhost:22" >> $conf_file
+echo -e "Restart=always" >> $conf_file
+echo -e "RestartSec=30" >> $conf_file
 echo -e "\n[Install]" >> $conf_file
 echo -e "WantedBy=multi-user.target" >> $conf_file
 
