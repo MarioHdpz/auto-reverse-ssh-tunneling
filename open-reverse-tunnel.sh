@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# TODO: Add cron to restart tunnel once a day
+# 0 8 * * * /bin/systemctl restart autotunnel
+
 # Use root user
 [ "$UID" -eq 0 ] || exec sudo bash "$0" "$@"
 
