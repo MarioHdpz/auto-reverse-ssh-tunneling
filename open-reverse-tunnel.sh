@@ -93,6 +93,7 @@ echo -e "\n[Service]" >> $conf_file
 echo -e "ExecStart=/usr/bin/autossh -nNT -i ${key} ${user}@${host} -R ${port}:localhost:22" >> $conf_file
 echo -e "Restart=always" >> $conf_file
 echo -e "RestartSec=30" >> $conf_file
+echo -e "RuntimeMaxSec=14400" >> $conf_file
 echo -e "\n[Install]" >> $conf_file
 echo -e "WantedBy=multi-user.target" >> $conf_file
 
